@@ -2,9 +2,9 @@ name: JMeter로 부하테스트
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "master", "dev" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
   workflow_dispatch: # Actions 탭에서 수동으로 '딸깍' 실행하기 위한 트리거
 
 jobs:
@@ -23,11 +23,11 @@ jobs:
           node-version: 18
 
       # [3] 가짜 API 서버(json-server) 기동
-      # &를 붙여 백그라운드 실행해야 다음 스텝으로 넘어감
+      # ⭐⭐⭐ &를 붙여 백그라운드 실행해야 다음 스텝으로 넘어감
       - name: Start Mock API Server
         run: |
           npm install -g json-server
-          json-server --watch ./src/backend/db-pika.json --port 3333
+          json-server --watch ./src/backend/db-pika.json --port 3333 &
 
       # [4] JMeter 최신 버전 다운로드 및 압축 해제
       # 리눅스 기본 패키지(apt)는 버전이 낮아 리포트 생성(-e) 옵션이 안 먹을 수 있음
