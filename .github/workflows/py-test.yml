@@ -1,54 +1,52 @@
-name: all branch, Pytest + Allure 리폿
+name: 모든 브랜치 Pytest 및 Allure 리포트 생성
 
 on:
   push:
-    branches: ["**"] # 모든 브랜치 대상
+    # master와 dev 브랜치를 제외한 모든 브랜치에서 푸시 발생 시 실행
+    branches-ignore:
+      - 'master'
+      - 'dev'
+  # Actions 탭에서 수동 실행 가능
   workflow_dispatch:
 
 jobs:
-  test:
+  pytest-test:
+    name: 파이테스트 및 리포트 생성
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 코드 체크아웃
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: 파이썬 환경 설정 (3.10)
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
+      - name: 필수 라이브러리 설치
         run: |
           python -m pip install --upgrade pip
           pip install pytest allure-pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Run Pytest with Allure
+      - name: 테스트 실행 및 Allure 결과 수집
         run: |
           mkdir -p allure-results
           pytest --alluredir=allure-results
-        continue-on-error: true # 테스트가 실패해도 리포트 생성을 위해 계속 진행
-
-      - name: Get Allure history
-        uses: actions/checkout@v4
-        if: always()
+        # 테스트가 실패해도 리포트 생성을 위해 다음 단계 진행
         continue-on-error: true
-        with:
-          ref: gh-pages
-          path: gh-pages
 
-      - name: Generate Allure Report
+      - name: Allure HTML 리포트 변환
         uses: simple-elf/allure-report-action@master
         if: always()
         with:
           allure_results: allure-results
-          allure_history: allure-history
-          keep_reports: 20
+          # 히스토리 기능 미사용으로 관련 설정 제외
+          keep_reports: 10
 
-      - name: Upload Allure Report Artifact
+      - name: 최종 리포트 업로드 (Artifacts)
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: allure-report
+          name: 테스트-결과-리포트
           path: allure-report
