@@ -5,7 +5,7 @@ on:
     branches: [ "dev" ]
   pull_request:
     branches: [ "dev" ]
-  workflow_dispatch: # Actions 탭에서 수동으로 '딸깍' 실행하기 위한 트리거 룰 테스트
+  workflow_dispatch: # Actions 탭에서 수동으로 '딸깍' 실행하기 위한 트리거
 
 jobs:
   performance-test:
